@@ -1,5 +1,6 @@
 // The twelve chambers as data: ASCII vaults, loose relics, pars and the scripted solutions the tools replay.
 const walk = (t, n) => Array.from({ length: n }, () => ({ t }));
+const plan = actions => [...actions].map(t => ({ t }));
 export const CHAMBERS = [
   {
     name: 'FIRST TURN', wing: 'DAWN', par: 2, goal: 'SEAT THE IDOL',
@@ -59,7 +60,7 @@ export const CHAMBERS = [
       '#.............#', '#.............#', '#.............#', '#.............#',
       '#DH.>^^^####Z.#', '###############'
     ],
-    solution: [{ t: 'R' }, { t: 'L' }, { t: '<' }, { t: '<' }]
+    solution: plan('LRRLL')
   },
   {
     name: 'THE CROSS', wing: 'NOON', par: 4, goal: 'SEAT THE IDOL',
@@ -109,7 +110,7 @@ export const CHAMBERS = [
       '#..........#..#', '#.............#', '#.............#', '#.............#',
       '#SSDAZ<.H.....#', '###############'
     ],
-    solution: [{ t: '<' }, { t: '<' }, { t: '<' }, { t: '<' }, { t: '<' }, { t: '<' }, { t: '<' }, { t: 'L' }, { t: 'R' }, { t: '>' }, { t: '>' }]
+    solution: plan('L<R>>')
   },
   {
     name: 'THE HEART TURNS', wing: 'DUSK', par: 6, goal: 'SEAT EVERYTHING',
