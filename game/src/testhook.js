@@ -10,33 +10,36 @@ import { spawnDust, spawnFloater, spawnStreak } from './render/fx.js';
 const playActions = (state, actions) => { for (const action of actions) applyAction(state, action); };
 
 function stagePlay(state, stage) {
-  loadChamber(state, 9);
-  // Mid-play staging (improvement round 2): the two-turn symphony has just
-  // landed — Idol seated, brazier lit, crate on the first switch — but the
-  // door is still shut and Nilo has not yet crossed to the second switch.
-  // A live decision point, not an aftermath: no clear banner, goals half met.
-  playActions(state, [{ t: 'R' }, { t: 'L' }]);
+  loadChamber(state, 11);
+  playActions(state, [...Array(7).fill({ t: '<' }), { t: 'L' }, { t: 'R' }]);
   state.events.length = 0;
-  state.score = 8450;
+  state.score = 11200;
+  state.save = { ...(state.save || {}), best: 12400 };
   state.banner = null;
   state.mode = 'play';
-  globalThis.__TK_ANGLE = 12;
+  globalThis.__TK_ANGLE = 8;
   const point = (kind, fallback) => {
     const e = state.entities.find(x => x.kind === kind);
     return boardPoint(state, e?.c ?? fallback[0], e?.r ?? fallback[1]);
   };
-  const idol = point('idol', [11, 7]), orb = point('orb', [10, 8]), crate = point('crate', [13, 7]);
+  const idol = point('idol', [11, 7]), crate = point('crate', [13, 7]);
   spawnFloater(stage, idol.x, idol.y - 44, '+300 SEATED', '#f4cb57');
-  spawnFloater(stage, orb.x, orb.y - 38, '+300 LIT', '#ffad4c');
+  for (const orbEntity of state.entities.filter(e => (e.kind === 'orb' || e.kind === 'ember') && e.seated)) {
+    const orb = boardPoint(state, orbEntity.c, orbEntity.r);
+    spawnFloater(stage, orb.x, orb.y - 38, '+300 LIT', '#ffad4c');
+  }
+  const doorTile = state.tiles.flatMap((row, r) => row.map((tile, c) => tile === 5 ? { c, r } : null)).find(Boolean);
+  if (doorTile) { const door = boardPoint(state, doorTile.c, doorTile.r); spawnFloater(stage, door.x, door.y - 38, 'LATCHED!', '#e4bf67'); }
   spawnDust(stage, idol.x, idol.y + 18, 12, '#cbb98e');
   spawnDust(stage, crate.x, crate.y + 18, 10, '#cbb98e');
   const heroEntity = state.entities.find(e => e.id === state.heroId);
   if (heroEntity) {
-    spawnStreak(stage, point('hero', [7, 8]).x - 20, point('hero', [7, 8]).y, 15, 0);
+    const heroPoint = boardPoint(state, heroEntity.c, heroEntity.r);
+    spawnStreak(stage, heroPoint.x - 20, heroPoint.y, 15, 0);
     const applyOffset = () => {
       if (window.__TK?.state !== state) return;
       const p = boardPoint(state, heroEntity.c, heroEntity.r);
-      stage.entityPos.set(heroEntity, { x: p.x - 28, y: p.y });
+      stage.entityPos.set(heroEntity, { x: p.x + 26, y: p.y });
     };
     applyOffset();
     setInterval(applyOffset, 30);
@@ -50,7 +53,7 @@ export function initTesthook() {
   if (!tk) return;
   const live = tk.state;
   const state = createRun(7, 'turning');
-  if (shot === 'play') { tk.save.best = 9650; stagePlay(state, tk.stage); }
+  if (shot === 'play') { tk.save.best = 12400; stagePlay(state, tk.stage); }
   else if (shot === 'title') {
     state.mode = 'title';
     const demo = createDemo(2077);
