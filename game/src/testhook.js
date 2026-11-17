@@ -11,37 +11,35 @@ const playActions = (state, actions) => { for (const action of actions) applyAct
 
 function stagePlay(state, stage) {
   loadChamber(state, 9);
-  playActions(state, CHAMBERS[9].solution.filter(action => action.t === 'R' || action.t === 'L' || action.t === '>'));
+  // Mid-play staging (improvement round 2): the two-turn symphony has just
+  // landed — Idol seated, brazier lit, crate on the first switch — but the
+  // door is still shut and Nilo has not yet crossed to the second switch.
+  // A live decision point, not an aftermath: no clear banner, goals half met.
+  playActions(state, [{ t: 'R' }, { t: 'L' }]);
   state.events.length = 0;
   state.score = 8450;
-  state.banner = 'win';
-  state.lastClearScore = 950;
+  state.banner = null;
   state.mode = 'play';
-  globalThis.__TK_ANGLE = 15;
+  globalThis.__TK_ANGLE = 12;
   const point = (kind, fallback) => {
     const e = state.entities.find(x => x.kind === kind);
     return boardPoint(state, e?.c ?? fallback[0], e?.r ?? fallback[1]);
   };
-  const crate = point('crate', [13, 8]), hero = point('hero', [3, 8]);
-  spawnDust(stage, crate.x, crate.y, 16, '#cbb98e');
-  spawnDust(stage, hero.x, hero.y + 18, 12, '#cbb98e');
-  spawnStreak(stage, hero.x - 18, hero.y, 16, 0);
-  const idol = point('idol', [3, 3]);
-  const orb = point('orb', [5, 1]);
-  const doorCell = state.tiles.flatMap((row, r) => row.map((tile, c) => tile === 5 ? { c, r } : null)).find(Boolean) || { c: 1, r: 8 };
-  const door = boardPoint(state, doorCell.c, doorCell.r);
+  const idol = point('idol', [11, 7]), orb = point('orb', [10, 8]), crate = point('crate', [13, 7]);
   spawnFloater(stage, idol.x, idol.y - 44, '+300 SEATED', '#f4cb57');
   spawnFloater(stage, orb.x, orb.y - 38, '+300 LIT', '#ffad4c');
-  spawnFloater(stage, door.x, door.y - 24, 'LATCHED!', '#e4bf67');
+  spawnDust(stage, idol.x, idol.y + 18, 12, '#cbb98e');
+  spawnDust(stage, crate.x, crate.y + 18, 10, '#cbb98e');
   const heroEntity = state.entities.find(e => e.id === state.heroId);
   if (heroEntity) {
-    const pos = boardPoint(state, heroEntity.c, heroEntity.r);
-    stage.entityPos.set(heroEntity, { x: pos.x - 30, y: pos.y });
-    setInterval(() => {
+    spawnStreak(stage, point('hero', [7, 8]).x - 20, point('hero', [7, 8]).y, 15, 0);
+    const applyOffset = () => {
       if (window.__TK?.state !== state) return;
       const p = boardPoint(state, heroEntity.c, heroEntity.r);
-      stage.entityPos.set(heroEntity, { x: p.x - 30, y: p.y });
-    }, 30);
+      stage.entityPos.set(heroEntity, { x: p.x - 28, y: p.y });
+    };
+    applyOffset();
+    setInterval(applyOffset, 30);
   }
 }
 
