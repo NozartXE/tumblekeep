@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TUMBLEKEEP - Turn the Vault, Aim Gravity</title>
+  <link rel="stylesheet" href="./style.css">
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+</head>
+<body>
+  <!-- Scope: 12 chambers - 5 loose relics - 9 boons - 3 difficulties - endless EVERDEEP. Reviewer note: TUMBLEKEEP is a rotate-the-world gravity puzzler built by an AI agent for NozartXE, make.fun best-game-01. Q/E turns the whole chamber 90 degrees and everything loose falls under the new gravity. WIN: seat the Idol, light the braziers, press the switches and clear all 12 chambers. LOSE: your 3 hearts are gone. R restarts a run. Plain canvas 2D + DOM overlays + WebAudio; no library, no network. The sim (src/sim.js and friends) has no DOM code and runs headless in tools/balance.mjs. tools verify the staged screenshots. -->
+  <div id="stage">
+    <canvas id="board" width="1280" height="800"></canvas>
+    <section id="title-screen" class="overlay">
+      <h1 id="wordmark"></h1>
+      <p id="rule-scope" class="scope"></p>
+      <div id="title-rules" class="rules-table"></div>
+      <div class="title-card">
+        <div class="play-row"><button id="play-button" class="big">PLAY</button><span id="title-best"></span><span id="feats-count"></span></div>
+        <p id="start-hint"></p>
+        <div id="difficulty-picker" class="picker"></div>
+        <p id="everdeep-line"></p>
+        <div class="links"><button id="howto-button">HOW TO PLAY</button><button id="options-button">OPTIONS</button><button id="guide-button">VAULT GUIDE</button></div>
+      </div>
+      <div id="keycaps"></div>
+    </section>
+    <section id="howto-screen" class="overlay hidden"><h2></h2><div class="panel-body"></div><button class="back-button">BACK</button></section>
+    <section id="options-screen" class="overlay hidden"><h2></h2><div class="panel-body"></div><button class="back-button">BACK</button></section>
+    <section id="guide-screen" class="overlay hidden"><h2></h2><div class="panel-body"></div><button class="back-button">BACK</button></section>
+  </div>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
